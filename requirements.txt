@@ -1,12 +1,11 @@
 streamlit
 pypdf
 numpy
-sentence_transformers
-google_genai
+sentence-transformers
+google-genai
 python-dotenv
-rank_bm25
-faiss
+rank-bm25
+faiss-cpu
 langchain
-dotenv
 reportlab
 scikit-learn
