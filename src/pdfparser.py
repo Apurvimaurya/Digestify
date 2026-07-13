@@ -65,7 +65,7 @@ def preprocess(text):
 
 def extract_pdf_text(file):
     reader = PdfReader(file)
-    file_name = os.path.basename(file)
+    file_name = file.name
 
     raw_pages = []
 
@@ -90,8 +90,5 @@ def extract_pdf_text(file):
     return corpus, clean_pages
 
 
-corpus, pages = extract_pdf_text(r"notebooks\Normalization.pdf")
 
-print(corpus)
-print("\n----------------------------\n")
-print(pages)
+

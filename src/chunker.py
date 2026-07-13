@@ -1,4 +1,4 @@
-from pdfparser import extract_pdf_text
+
 
 def chunk_text(clean_pages, chunk_size, overlap):
     if overlap >= chunk_size:

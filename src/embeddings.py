@@ -19,3 +19,14 @@ def create_prompt_embeddings(prompt):
     prompt_embedding= model.encode(prompt)
     return prompt_embedding
 
+def create_question_embeddings(questions):
+    q_embed=[]
+    questions= [q["question"] for q in questions]
+    vectors= model.encode(questions)
+    for q, vector in zip(questions, vectors):
+        q_embed.append({
+            "question": q["question"],
+            "embedding": vector,
+            "expected_chunk": q["expected_chunk"]
+        })
+    return q_embed
