@@ -2,57 +2,70 @@
 
 > AI-powered Study Assistant built from scratch using Retrieval-Augmented Generation (RAG).
 
-Digestify allows users to upload PDF study material, ask questions about the content, retrieve the most relevant information using multiple retrieval strategies, and (coming soon) generate concise study notes from an entire learning session.
+Digestify is an end-to-end RAG-based study assistant that allows users to upload PDF study material, ask context-aware questions, retrieve the most relevant information using hybrid retrieval, generate structured AI-powered study notes from an entire learning session, and export those notes as a downloadable PDF.
 
 ---
 
-## Features (Completed)
+## Features
 
-- PDF text extraction pipeline
-- Document preprocessing
-- Custom chunking engine
-- LangChain Recursive Character Text Splitter comparison
-- SentenceTransformer embeddings
-- Custom cosine similarity retriever
-- FAISS vector search
-- BM25 keyword search
-- Hybrid Retrieval (FAISS + BM25 using Reciprocal Rank Fusion)
-- Retrieval Evaluation Harness
-- Streamlit Chat UI
+- 📄 PDF text extraction and preprocessing
+- ✂️ Custom chunking with metadata preservation
+- 🔍 LangChain Recursive Character Text Splitter comparison
+- 🧠 SentenceTransformer embeddings
+- 📌 Cosine similarity retriever
+- ⚡ FAISS semantic search
+- 🔎 BM25 keyword search
+- 🤝 Hybrid Retrieval using Reciprocal Rank Fusion (RRF)
+- 📊 Retrieval evaluation benchmark (Precision@5)
+- 💬 Conversational chat interface
+- 📚 Chat memory
+- 🏷️ Source attribution (page number & chunk metadata)
+- 🧩 Semantic question deduplication
+- 📝 AI-powered Smart Notes generation
+- 📄 PDF export of generated notes
+- 🎨 Interactive Streamlit interface
 
 ---
 
 ## Project Pipeline
 
-```
-                PDF
-                 │
-                 ▼
-          PDF Parser
-                 │
-                 ▼
-      Text Cleaning Pipeline
-                 │
-                 ▼
-        Document Chunking
-                 │
-                 ▼
-        Sentence Embeddings
-                 │
-         ┌───────┴────────┐
-         │                │
-         ▼                ▼
-     BM25 Search     Dense Search
+
+                     PDF Upload
                           │
-                     FAISS Index
-         └───────┬────────┘
-                 ▼
-      Reciprocal Rank Fusion
-                 ▼
-       Top-K Relevant Chunks
-                 ▼
-        (LLM Generation - WIP)
-```
+                          ▼
+                   PDF Parsing
+                          │
+                          ▼
+                 Text Preprocessing
+                          │
+                          ▼
+                 Custom Chunking
+                          │
+                          ▼
+             Sentence Embeddings
+                          │
+                 ┌────────┴────────┐
+                 ▼                 ▼
+          Dense Retrieval      BM25 Retrieval
+               (FAISS)
+                 └────────┬────────┘
+                          ▼
+           Reciprocal Rank Fusion
+                          ▼
+              Top-K Relevant Chunks
+                          ▼
+              Gemini 2.5 Flash Lite
+                          ▼
+          Context-Aware Answer Generation
+                          ▼
+               Conversation History
+                          ▼
+      Semantic Question Deduplication
+                          ▼
+         AI Structured Notes Generation
+                          ▼
+              PDF Notes Export
+
 
 ---
 
@@ -66,7 +79,11 @@ Digestify allows users to upload PDF study material, ask questions about the con
 
 - Streamlit
 
-### NLP / Retrieval
+### LLM
+
+- Google Gemini 2.5 Flash Lite API
+
+### Retrieval
 
 - Sentence Transformers
 - FAISS
@@ -75,22 +92,30 @@ Digestify allows users to upload PDF study material, ask questions about the con
 ### PDF Processing
 
 - PyPDF
+- ReportLab
+
+### ML / NLP
+
+- scikit-learn
+- NumPy
 
 ### Utilities
 
-- NumPy
 - Regex
 - Collections
+- dotenv
 
 ---
 
 # Project Structure
 
-```
+```text
 Digestify/
 
 │
 ├── app.py
+├── requirements.txt
+├── README.md
 │
 ├── src/
 │   ├── pdfparser.py
@@ -101,45 +126,47 @@ Digestify/
 │   ├── faiss_retriever.py
 │   ├── bm25_retriever.py
 │   ├── hybrid_retriever.py
-│   └── evaluation.py
+│   ├── llm.py
+│   ├── evaluation.py
+│   ├── notes_generator.py
+│   ├── semantic_deduplication.py
+│   └── pdf_export.py
 │
 ├── notebooks/
 │
-├── requirements.txt
-│
-└── README.md
+└── assets/
 ```
 
 ---
 
 # Completed Stages
 
-## Stage 0 — RAG Fundamentals
+## ✅ Stage 0 — RAG Fundamentals
 
 Learned
 
-- Why LLMs hallucinate
-- RAG pipeline
+- RAG Architecture
+- Embeddings
 - Dense vs Sparse Retrieval
 - Vector Databases
-- Embeddings
+- Hallucination Mitigation
 - Hybrid Retrieval
 
 ---
 
-## Stage 1 — Streamlit UI
+## ✅ Stage 1 — Streamlit UI
 
 Built
 
 - Chat Interface
 - Session State
 - PDF Upload
-- Notes Button
-- Download Button
+- Notes Generation
+- PDF Download
 
 ---
 
-## Stage 2 — PDF Parsing
+## ✅ Stage 2 — PDF Parsing
 
 Implemented
 
@@ -149,24 +176,13 @@ Implemented
 - Corpus generation
 - Page-wise metadata
 
-Output
-
-```python
-{
-    "page": 4,
-    "source": "book.pdf",
-    "text": "..."
-}
-```
-
 ---
 
-## Stage 3 — Chunking
+## ✅ Stage 3 — Chunking
 
 Implemented
 
-Custom chunking
-
+- Custom chunking
 - Adjustable chunk size
 - Adjustable overlap
 - Metadata preservation
@@ -175,20 +191,9 @@ Compared against
 
 - LangChain RecursiveCharacterTextSplitter
 
-Output
-
-```python
-{
-    "chunk_id": 14,
-    "page": 5,
-    "source": "...",
-    "text": "..."
-}
-```
-
 ---
 
-## Stage 4 — Embeddings
+## ✅ Stage 4 — Embeddings
 
 Model
 
@@ -200,141 +205,162 @@ Generated
 
 - Chunk embeddings
 - Query embeddings
-- Vector matrix
 
 ---
 
-## Stage 5 — Naive Retriever
+## ✅ Stage 5 — Naive Retriever
 
-Built cosine similarity search completely from scratch.
+Implemented
 
-Pipeline
-
-```
-Question
-      ↓
-Embedding
-      ↓
-Cosine Similarity
-      ↓
-Rank Top-K
-```
+- Cosine Similarity Search
+- Top-K Ranking
 
 ---
 
-## Stage 6 — FAISS
+## ✅ Stage 6 — FAISS
 
 Implemented
 
 - Vector Index
 - Semantic Search
-- Fast Nearest Neighbor Retrieval
-
-Learned why FAISS improves retrieval speed rather than retrieval quality.
+- Efficient Nearest Neighbor Retrieval
 
 ---
 
-## Stage 7 — Hybrid Retrieval
+## ✅ Stage 7 — Hybrid Retrieval
 
 Implemented
 
 - BM25
-- Dense Retrieval
-- Reciprocal Rank Fusion (RRF)
-
-Pipeline
-
-```
-Question
-      │
-      ├──────────────┐
-      ▼              ▼
-Dense Search     BM25 Search
-      │              │
-      └──────┬───────┘
-             ▼
-     Reciprocal Rank Fusion
-             ▼
-        Final Ranking
-```
+- FAISS
+- Reciprocal Rank Fusion
 
 ---
 
-## Stage 8 — Evaluation Harness
+## ✅ Stage 8 — Retrieval Evaluation
 
 Created
 
-Custom evaluation benchmark containing 20 manually labeled questions.
-
-Compared
-
-- Naive Retriever
-- FAISS
-- BM25
-- Hybrid Retrieval
+- 20 manually labeled benchmark questions
 
 Metric
 
 - Precision@5
-
-Current Results
 
 | Retriever | Precision@5 |
 |------------|------------:|
 | Naive Cosine | 0.75 |
 | FAISS | 0.75 |
 | BM25 | 0.65 |
-| Hybrid | 0.75 |
+| Hybrid | **0.75** |
 
 ---
 
-# Upcoming
+## ✅ Stage 9 — LLM Integration
 
-- LLM Generation
-- Prompt Engineering
-- Chat Memory
-- Smart Notes Generation
-- PDF Export
-- Deployment
+Implemented
+
+- Gemini API integration
+- Context-aware prompting
+- Grounded answer generation
+- System & user prompt separation
+
+---
+
+## ✅ Stage 10 — Source Attribution
+
+Implemented
+
+- Page citation
+- Chunk metadata
+- Source-aware answers
+
+---
+
+## ✅ Stage 11 — Chat Memory
+
+Implemented
+
+- Conversation history
+- Multi-turn question answering
+
+---
+
+## ✅ Stage 12 — Semantic Question Deduplication
+
+Implemented
+
+- SentenceTransformer embeddings
+- Cosine similarity matrix
+- Threshold-based clustering
+
+---
+
+## ✅ Stage 13 — Smart Notes Generation
+
+Implemented
+
+- AI-generated structured notes
+- Topic-wise clustering
+- Markdown formatting
+
+---
+
+## ✅ Stage 14 — PDF Export
+
+Implemented
+
+- ReportLab integration
+- Structured PDF generation
+- One-click download
 
 ---
 
 # What I Learned
 
-Through building this project I learned
+Through building Digestify, I gained hands-on experience with
 
 - Retrieval-Augmented Generation (RAG)
-- Dense Retrieval
-- Sparse Retrieval
-- Hybrid Retrieval
+- Hybrid Retrieval Systems
+- Dense & Sparse Retrieval
 - Reciprocal Rank Fusion
 - Sentence Embeddings
-- Cosine Similarity
 - FAISS Indexing
 - BM25 Ranking
-- Evaluation of Retrieval Systems
+- Prompt Engineering
+- Gemini API Integration
+- Chat Memory
+- Semantic Clustering
 - PDF Parsing
-- Chunking Strategies
-- End-to-End ML Project Architecture
+- Retrieval Evaluation
+- ReportLab PDF Generation
+- End-to-End AI Application Development
+- Streamlit State Management
 
 ---
 
 # Future Improvements
 
-- Query Expansion
 - Cross Encoder Re-ranking
-- Multi-PDF Support
-- Citation Generation
+- Query Expansion
+- Multi-PDF Chat
+- Streaming Responses
 - Source Highlighting
-- Better Chunking Strategies
 - Advanced Evaluation Metrics
+- Knowledge Graph Integration
 
 ---
 
-## Status
+# Demo
 
-🚧 Work in Progress
+(Add screenshots and deployment link here after deployment.)
 
-Current Progress:
+---
 
-**Stage 8 / Stage 13 Completed**
+# Status
+
+## ✅ Current Progress
+
+**Stage 14 / Stage 14 Completed**
+
+🎉 Digestify is now a fully functional end-to-end RAG study assistant capable of answering questions from uploaded PDFs, generating structured study notes, and exporting them as downloadable PDFs.
