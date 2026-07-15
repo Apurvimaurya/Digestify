@@ -5,6 +5,21 @@
 Digestify is an end-to-end RAG-based study assistant that allows users to upload PDF study material, ask context-aware questions, retrieve the most relevant information using hybrid retrieval, generate structured AI-powered study notes from an entire learning session, and export those notes as a downloadable PDF.
 
 ---
+## Home Page
+
+<img src="assets/home.jpeg" width="900">
+
+---
+
+## Ask Questions
+
+<img src="assets/chat.jpeg" width="900">
+
+---
+
+## AI Generated Smart Notes
+
+<img src="assets/notes.jpeg" width="900">
 
 ## Features
 
