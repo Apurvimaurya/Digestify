@@ -254,20 +254,33 @@ Implemented
 
 ## ✅ Stage 8 — Retrieval Evaluation
 
-Created
+Hit Rate@5
 
-- 20 manually labeled benchmark questions
+Evaluated on a 20-question set against a database normalization PDF.
+Note: this measures whether *any* correct chunk appeared in the top-5 
+results (Hit Rate@5), not strict Precision@5.
 
-Metric
+| Retriever | Overall | Keyword/Definition Qs | Conceptual Qs |
+|-----------|---------|------------------------|-----------------|
+| Naive     | 0.75    | 0.73                    | 0.80             |
+| FAISS     | 0.75    | 0.73                    | 0.80             |
+| BM25      | 0.70    | 0.67                    | 0.80             |
+| Hybrid    | 0.70    | 0.67                    | 0.80             |
 
-- Precision@5
+Naive and FAISS produced identical results, confirming correct FAISS 
+indexing on this corpus.
 
-| Retriever | Precision@5 |
-|------------|------------:|
-| Naive Cosine | 0.75 |
-| FAISS | 0.75 |
-| BM25 | 0.65 |
-| Hybrid | **0.75** |
+Contrary to my initial hypothesis, hybrid retrieval did not outperform 
+dense-only retrieval on this evaluation set. Inspecting misses showed 
+BM25 actively hurt performance on 3 keyword questions dense retrieval 
+answered correctly (e.g., "What is superkey?", "What is 3NF?") — the 
+query terms appeared frequently across the document, so BM25 surfaced 
+several plausible but incorrect chunks that outranked the correct one 
+after RRF fusion. This suggests hybrid search benefits queries where 
+exact terms are rare/distinctive in the corpus, but can introduce 
+noise when the term recurs across many sections — a tradeoff worth 
+tuning (e.g., weighting dense results higher in RRF, or filtering 
+BM25 candidates by a minimum score threshold) in future work.
 
 ---
 
