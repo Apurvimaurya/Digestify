@@ -14,6 +14,17 @@ from src.Notes_gen import notes_generator
 from src.topic_cluster import deduplication
 from src.notes_pdf import notes_pdf_gen
 import json
+import re
+
+def safe_json_parse(text):
+    """Strip markdown code fences and safely parse Gemini's JSON response."""
+    if not text or not text.strip():
+        return {"label": "unknown", "reason": "Empty response from judge model."}
+    cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        return {"label": "unknown", "reason": "Could not parse judge response."}
 # ---------------- SESSION STATE ---------------- #
 
 if "messages" not in st.session_state:
@@ -120,7 +131,7 @@ if st.session_state.chunks is not None:
         with st.spinner("Thinking..."):
             response = get_response(prompt, top_chunks)
             faithfullness= judge_faithfullness(prompt, top_chunks, response)
-            result= json.loads(faithfullness.text)
+            result = safe_json_parse(faithfullness.text)
             
 
         with st.chat_message("assistant"):
