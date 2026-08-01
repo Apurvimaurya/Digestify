@@ -90,7 +90,8 @@ evaluation_set=[
     
     
 ]
-corpus, clean_pages = extract_pdf_text("notebooks/Normalization.pdf")
+with open("src/Normalization.pdf", "rb") as f:
+    corpus, clean_pages = extract_pdf_text(f)
 lc_chunks = langchain_chunker(clean_pages, 500, 100)
 embed, vectormatrix= create_chunk_embeddings(lc_chunks)
 
@@ -147,7 +148,81 @@ def evaluate_hybrid():
     score= success/len(evaluation_set)
     return {"retriever":"Hybrid", "Precision@k": score}
 
+# --- Add this after your existing evaluation_set definition ---
 
+keyword_questions = {
+    "What is Lossless Decompostion ?",
+    "What are Functional Dependencies ?",
+    "What is a Legal Instance of a Relation ?",
+    "What is a Closure?",
+    "What is superkey ?",
+    "What is a trivial FD ?",
+    "What is Dependency Preservation ?",
+    "What is BCNF?",
+    "What is 3NF?",
+    "What is a Closure of FD ?",
+    "What are Armstrong's Axionms ?",
+    "What are extraneous attributes ?",
+    "What is Cannonical cover ?",
+    "What is bcnf decompostion algo ?",
+    "what is 3nf decompostion algorithm ?",
+}
+# everything else in evaluation_set is treated as "conceptual"
+
+def sliced_eval(retriever_fn, name):
+    """retriever_fn(q) -> set of retrieved chunk_ids for a question dict q"""
+    rows = []
+    for q in evaluation_set:
+        expected = set(q["expected_chunks"])
+        retrieved = retriever_fn(q)
+        hit = bool(expected & retrieved)
+        qtype = "keyword" if q["question"] in keyword_questions else "conceptual"
+        rows.append({
+            "question": q["question"],
+            "type": qtype,
+            "expected": expected,
+            "retrieved": retrieved,
+            "hit": hit
+        })
+
+    kw_hits = [r["hit"] for r in rows if r["type"] == "keyword"]
+    cc_hits = [r["hit"] for r in rows if r["type"] == "conceptual"]
+
+    print(f"\n=== {name} ===")
+    print(f"Overall:    {sum(r['hit'] for r in rows)}/{len(rows)} = {sum(r['hit'] for r in rows)/len(rows):.2f}")
+    print(f"Keyword:    {sum(kw_hits)}/{len(kw_hits)} = {sum(kw_hits)/len(kw_hits):.2f}")
+    print(f"Conceptual: {sum(cc_hits)}/{len(cc_hits)} = {sum(cc_hits)/len(cc_hits):.2f}")
+
+    # print misses so you can pick concrete examples for the README
+    print("Misses:")
+    for r in rows:
+        if not r["hit"]:
+            print(f"  [{r['type']}] {r['question']}  expected={r['expected']} got={r['retrieved']}")
+    return rows
+
+
+# --- wire up each retriever ---
+
+def faiss_fn(q):
+    prompt_e = create_prompt_embeddings(q["question"])
+    return {c["chunk_id"] for c in faiss_retriever(prompt_e, embed, vectormatrix, 5)}
+
+def bm25_fn(q):
+    return {c["chunk_id"] for c in bm25_chunk_retriever(lc_chunks, q["question"], 5)}
+
+def naive_fn(q):
+    prompt_e = create_prompt_embeddings(q["question"])
+    return {c["chunk_id"] for c in naive_retriever(prompt_e, embed, 5)}
+
+def hybrid_fn(q):
+    prompt_e = create_prompt_embeddings(q["question"])
+    return {c["chunk_id"] for c in hybrid_retriever(lc_chunks, q["question"], 5, prompt_e, embed, vectormatrix)}
+
+
+sliced_eval(naive_fn, "Naive")
+sliced_eval(faiss_fn, "FAISS")
+sliced_eval(bm25_fn, "BM25")
+sliced_eval(hybrid_fn, "Hybrid")
 
 #evalutation
 results = [
