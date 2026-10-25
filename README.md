@@ -379,11 +379,9 @@ Through building Digestify, I gained hands-on experience with
 
 ---
 
-# Demo
 
-(Add screenshots and deployment link here after deployment.)
 
----
+
 
 # Status
 
@@ -391,4 +389,3 @@ Through building Digestify, I gained hands-on experience with
 
 **Stage 14 / Stage 14 Completed**
 
-🎉 Digestify is now a fully functional end-to-end RAG study assistant capable of answering questions from uploaded PDFs, generating structured study notes, and exporting them as downloadable PDFs.
